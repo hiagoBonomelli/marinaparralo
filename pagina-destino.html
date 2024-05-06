@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Marina Parralo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&display=swap" rel="stylesheet">
+<style>
+    body, html {
+        height: 100%;                /* Faz com que a altura do body e html ocupem toda a tela */
+        margin: 0;                   /* Remove as margens padrão */
+        display: flex;               /* Aplica o display flexível ao container */
+        justify-content: center;     /* Centraliza horizontalmente */
+        align-items: center;         /* Centraliza verticalmente */
+        background-color: #f0f0f0;   /* Cor de fundo para diferenciar o retângulo */
+    }
+
+    .rectangle {
+        width: 350px;                /* Largura do retângulo */
+        height: 500px;               /* Altura do retângulo, 2 vezes a largura */
+        background-color: #f8d7da;   /* Cor de fundo do retângulo */
+        border-left: 30px solid #f9beb8; /* Borda esquerda do retângulo */
+        border-right: 30px solid #f9beb8; /* Borda direita do retângulo */
+        display: flex;               /* Habilita display flex no retângulo */
+        flex-direction: column;      /* Organiza os itens em coluna */
+        justify-content: flex-start; /* Modificado para iniciar o alinhamento de itens no topo */
+        align-items: center;         /* Centraliza os itens horizontalmente */
+        padding-top: 20px;           /* Espaço no topo dentro do retângulo */
+    }
+
+    .divider {
+        width: 80%;                  /* Largura da linha divisória para cobrir o retângulo */
+        height: 2px;                 /* Espessura da linha divisória */
+        background-color: #000;      /* Cor da linha divisória */
+        position: relative;          /* Posição relativa para estar dentro do retângulo */
+        top: 20px;                   /* Posição ajustada para baixo dentro do retângulo */
+    }
+
+    .barcode {
+        width: 300px;                /* Largura da imagem do código de barras */
+        height: auto;                /* Altura automática para manter a proporção da imagem */
+        align-self: center;          /* Centraliza o código de barras horizontalmente dentro do retângulo */
+        opacity: 0.3;                /* Define a transparência do código de barras */
+        margin-top: auto;            /* Empurra o código de barras para baixo dentro do retângulo */
+        
+    }
+
+    .content {
+        font-family: 'Caveat', serif; /* Especifica a fonte do conteúdo */
+        font-size: 50px;              /* Tamanho da fonte */
+        text-align: center;           /* Alinhamento do texto */
+        opacity: 0.5;                /* Define a transparência do código de barras */
+        margin: 0; 
+    }
+
+    .content2 {
+        font-family: 'Caveat', serif; /* Especifica a fonte do conteúdo */
+        font-size: 30px;              /* Tamanho da fonte */
+        text-align: center;           /* Alinhamento do texto */
+        opacity: 0.5;                /* Define a transparência do código de barras */
+        margin: 0; 
+    }
+
+    canvas {
+    margin-top: 5px;
+    cursor: pointer;
+    }
+
+    #whatsapp-button {
+        display: none;
+        position: relative;
+        bottom: 200px;
+        width: 30%;
+        padding: 10px 0;
+        font-size: 16px;
+        background-color: #25D366;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    #texto {
+        display: none;
+        bottom: 200px;
+        position: relative;
+        font-size: 14px;
+        width: 75%;
+        opacity: 0.6; 
+    }
+
+</style>
+</head>
+<body>
+<div class="rectangle">
+    <h1 class="content">Loteria</h1>
+    <h1 class="content2">Você ganhou! Raspe aqui:</h1>
+    <canvas width="280" height="200"></canvas>
+    <h2 id="texto"> Você está cansada de dar corda para barbaridades e de receber convites para um 'date' em casa às 3h da manhã? 
+        Está procurando uma companhia para conhecer a Itália, Bali e Aspen, alguém com bom senso de humor e que trate bem as pessoas? 
+        Clique no botão abaixo para mais informações.
+    </h2>
+    <button id="whatsapp-button" onclick="window.location.href='https://wa.me/+5511980134813';">WhatsApp</button>
+    <img id="barcode" src="barcode.png" alt="Código de Barras" class="barcode"> <!-- Inserção da imagem do código de barras -->
+</div> <!-- Criação do retângulo -->
+
+<script>
+    const canvas = document.querySelector('canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#e3efda';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    let isDrawing = false;
+
+    function startDrawing() {
+        isDrawing = true;
+    }
+
+    function stopDrawing() {
+        isDrawing = false;
+    }
+
+    function draw(e) {
+        if (!isDrawing) return;
+        let x, y;
+        if (e.touches) {
+            e.preventDefault();  // Previne scrolling ao tocar
+            const rect = canvas.getBoundingClientRect();
+            x = e.touches[0].clientX - rect.left;
+            y = e.touches[0].clientY - rect.top;
+        } else {
+            const rect = canvas.getBoundingClientRect();
+            x = e.clientX - rect.left;
+            y = e.clientY - rect.top;
+        }
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(x, y, 20, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    // Eventos de Mouse
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseleave', stopDrawing);
+    canvas.addEventListener('mousemove', draw);
+
+    // Eventos de Toque
+    canvas.addEventListener('touchstart', startDrawing);
+    canvas.addEventListener('touchend', stopDrawing);
+    canvas.addEventListener('touchcancel', stopDrawing);
+    canvas.addEventListener('touchmove', draw);
+
+    const checkScratch = () => {
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const pixels = imageData.data;
+        let cleared = 0;
+        for (let i = 0; i < pixels.length; i += 4) {
+            if (pixels[i + 3] === 0) { // checking transparency
+                cleared++;
+            }
+        }
+        if (cleared > (canvas.width * canvas.height * 0.5)) { // Check if more than 50% is cleared
+            document.getElementById('whatsapp-button').style.display = 'block';
+            document.getElementById('texto').style.display = 'block';
+            document.getElementById('barcode').style.display = 'none';
+        }
+    };
+    canvas.addEventListener('mouseup', checkScratch); // Could also check on 'mousemove' if immediate feedback is desired
+    canvas.addEventListener('touchmove', checkScratch);
+</script>
+
+</body>
+</html>
