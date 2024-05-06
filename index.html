@@ -112,45 +112,20 @@
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     let isDrawing = false;
-
-    function startDrawing() {
-        isDrawing = true;
-    }
-
-    function stopDrawing() {
-        isDrawing = false;
-    }
-
-    function draw(e) {
-        if (!isDrawing) return;
-        let x, y;
-        if (e.touches) {
-            e.preventDefault();  // Previne scrolling ao tocar
+    canvas.addEventListener('mousedown', () => isDrawing = true);
+    canvas.addEventListener('mouseup', () => isDrawing = false);
+    canvas.addEventListener('mouseleave', () => isDrawing = false);
+    canvas.addEventListener('mousemove', function(e) {
+        if (isDrawing) {
             const rect = canvas.getBoundingClientRect();
-            x = e.touches[0].clientX - rect.left;
-            y = e.touches[0].clientY - rect.top;
-        } else {
-            const rect = canvas.getBoundingClientRect();
-            x = e.clientX - rect.left;
-            y = e.clientY - rect.top;
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            ctx.arc(x, y, 20, 0, Math.PI * 2); // You can adjust the size of the 'scratch' here
+            ctx.fill();
         }
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.beginPath();
-        ctx.arc(x, y, 20, 0, Math.PI * 2);
-        ctx.fill();
-    }
-
-    // Eventos de Mouse
-    canvas.addEventListener('mousedown', startDrawing);
-    canvas.addEventListener('mouseup', stopDrawing);
-    canvas.addEventListener('mouseleave', stopDrawing);
-    canvas.addEventListener('mousemove', draw);
-
-    // Eventos de Toque
-    canvas.addEventListener('touchstart', startDrawing);
-    canvas.addEventListener('touchend', stopDrawing);
-    canvas.addEventListener('touchcancel', stopDrawing);
-    canvas.addEventListener('touchmove', draw);
+    });
 
     const checkScratch = () => {
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
